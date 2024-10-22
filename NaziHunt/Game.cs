@@ -18,7 +18,7 @@ public class Game : Microsoft.Xna.Framework.Game
 
     public Game()
     {
-        Content.RootDirectory = "assets";
+        Content.RootDirectory = "Content";
         _ = new GraphicsDeviceManager(this)
         {
             IsFullScreen = false
