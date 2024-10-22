@@ -7,25 +7,25 @@ namespace NaziHunt
     /// <summary>
     /// This is the main type for your game
     /// </summary>
-    public class Game1 : Microsoft.Xna.Framework.Game
+    public class Game : Microsoft.Xna.Framework.Game
     {
         GraphicsDeviceManager graphics;
 
         SpriteBatch spriteBatch;
 
-        List<ElementoJogo> aElemento;
+        List<GameObject> aElemento;
 
         KeyboardState teclado;
 
         MouseState mouse;
 
-        TelaMenu tela_menu;
+        MenuScreen tela_menu;
 
-        TelaFase1 tela_fase1;
-        TelaCreditos tela_credito;
+        Stage1Screen tela_fase1;
+        CreditsScreen tela_credito;
 
 
-        public Game1()
+        public Game()
         {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "assets";
@@ -40,7 +40,7 @@ namespace NaziHunt
         {
             // TODO: Add your initialization logic here
 
-            TelasDoJogo.status = TelasDoJogo.TelaJogo.TELA_MENU;
+            GameScreens.status = GameScreens.Screen.MENU;
             base.Initialize();
         }
 
@@ -73,14 +73,14 @@ namespace NaziHunt
                 posx += 170;
             }*/
 
-            tela_menu = new TelaMenu(this);
-            tela_fase1 = new TelaFase1(this);
-            tela_credito = new TelaCreditos(this);
+            tela_menu = new MenuScreen(this);
+            tela_fase1 = new Stage1Screen(this);
+            tela_credito = new CreditsScreen(this);
 
 
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
-            aElemento = new List<ElementoJogo>();
+            aElemento = new List<GameObject>();
 
         }
 
@@ -106,11 +106,11 @@ namespace NaziHunt
 
             teclado = Keyboard.GetState();
             mouse = Mouse.GetState();
-            if (TelasDoJogo.status == TelasDoJogo.TelaJogo.TELA_MENU)
+            if (GameScreens.status == GameScreens.Screen.MENU)
                 tela_menu.Update(gameTime, mouse);
-            else if (TelasDoJogo.status == TelasDoJogo.TelaJogo.TELA_FASE1)
+            else if (GameScreens.status == GameScreens.Screen.STAGE1)
                 tela_fase1.Update(gameTime, teclado);
-            else if (TelasDoJogo.status == TelasDoJogo.TelaJogo.TELA_SAIR)
+            else if (GameScreens.status == GameScreens.Screen.EXIT)
                 this.Exit();
 
 
@@ -135,18 +135,18 @@ namespace NaziHunt
             spriteBatch.Begin();
 
 
-            if (TelasDoJogo.status == TelasDoJogo.TelaJogo.TELA_MENU)
+            if (GameScreens.status == GameScreens.Screen.MENU)
                 tela_menu.Draw(gameTime, spriteBatch);
-            else if (TelasDoJogo.status == TelasDoJogo.TelaJogo.TELA_FASE1)
+            else if (GameScreens.status == GameScreens.Screen.STAGE1)
                 tela_fase1.Draw(gameTime, spriteBatch);
-            else if (TelasDoJogo.status == TelasDoJogo.TelaJogo.TELA_CREDITOS)
+            else if (GameScreens.status == GameScreens.Screen.CREDITS)
                 tela_credito.Draw(gameTime, spriteBatch, GraphicsDevice);
 
 
 
             spriteBatch.End();
 
-                base.Draw(gameTime);
-            }
+            base.Draw(gameTime);
         }
     }
+}

@@ -1,20 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
-using System.Collections;
 
 namespace NaziHunt
 {
-    class Inimigo : ElementoJogo
+    class Enemy : GameObject
     {
 
         AnimationSprites AndandoDireita, AndandoEsquerda;
 
-        public enum StatusInimigo { ANDANDO_DIREITA, ANDANDO_ESQUERDA , ATIRANDO_ESQUERDA, ATIRANDO_DIREITA }
+        public enum StatusInimigo { ANDANDO_DIREITA, ANDANDO_ESQUERDA, ATIRANDO_ESQUERDA, ATIRANDO_DIREITA }
         public StatusInimigo status;
 
         Texture2D atirando_esquerda, atirando_direita;
@@ -23,9 +17,9 @@ namespace NaziHunt
 
         int elapsedTime;
 
-        TiroInimigo tiroInimigo;
+        EnemyBullet tiroInimigo;
 
-        Game1 game;
+        Game game;
 
         public void Atirar(GameTime gameTime)
         {
@@ -50,29 +44,30 @@ namespace NaziHunt
             }
         }
 
-        public Inimigo(Game1 g, int l, int t, int w, int h)
+
+        public Enemy(Game g, int l, int t, int w, int h)
         {
             game = g;
 
-            atirando_direita =Flip.FlipImage(g.Content.Load<Texture2D>("images/inimigo_atirando.png"), false, true);
-            atirando_esquerda = g.Content.Load<Texture2D>("images/inimigo_atirando.png");
+            atirando_direita = Flip.FlipImage(g.Content.Load<Texture2D>("images/enemy_shoot.png"), false, true);
+            atirando_esquerda = g.Content.Load<Texture2D>("images/enemy_shoot.png");
 
             AndandoDireita = new AnimationSprites();
-     //       AndandoDireita.Add(Flip.FlipImage(g.Content.Load<Texture2D>("images/inimigo_andando_1.png"), false, true));
-            AndandoDireita.Add(Flip.FlipImage(g.Content.Load<Texture2D>("images/inimigo_andando_2.png"), false, true));
-            AndandoDireita.Add(Flip.FlipImage(g.Content.Load<Texture2D>("images/inimigo_andando_3.png"), false, true));
-            AndandoDireita.Add(Flip.FlipImage(g.Content.Load<Texture2D>("images/inimigo_andando_4.png"), false, true));
-            AndandoDireita.Add(Flip.FlipImage(g.Content.Load<Texture2D>("images/inimigo_andando_5.png"), false, true));
-            AndandoDireita.Add(Flip.FlipImage(g.Content.Load<Texture2D>("images/inimigo_andando_6.png"), false, true));
+            //       AndandoDireita.Add(Flip.FlipImage(g.Content.Load<Texture2D>("images/inimigo_andando_1.png"), false, true));
+            AndandoDireita.Add(Flip.FlipImage(g.Content.Load<Texture2D>("images/enemy_walk_2.png"), false, true));
+            AndandoDireita.Add(Flip.FlipImage(g.Content.Load<Texture2D>("images/enemy_walk_3.png"), false, true));
+            AndandoDireita.Add(Flip.FlipImage(g.Content.Load<Texture2D>("images/enemy_walk_4.png"), false, true));
+            AndandoDireita.Add(Flip.FlipImage(g.Content.Load<Texture2D>("images/enemy_walk_5.png"), false, true));
+            AndandoDireita.Add(Flip.FlipImage(g.Content.Load<Texture2D>("images/enemy_walk_6.png"), false, true));
             AndandoDireita.StartAnimation(100);
 
             AndandoEsquerda = new AnimationSprites();
-       //     AndandoEsquerda.Add(g.Content.Load<Texture2D>("images/inimigo_andando_1.png"));
-            AndandoEsquerda.Add(g.Content.Load<Texture2D>("images/inimigo_andando_2.png"));
-            AndandoEsquerda.Add(g.Content.Load<Texture2D>("images/inimigo_andando_3.png"));
-            AndandoEsquerda.Add(g.Content.Load<Texture2D>("images/inimigo_andando_4.png"));
-            AndandoEsquerda.Add(g.Content.Load<Texture2D>("images/inimigo_andando_5.png"));
-            AndandoEsquerda.Add(g.Content.Load<Texture2D>("images/inimigo_andando_6.png"));
+            //     AndandoEsquerda.Add(g.Content.Load<Texture2D>("images/enemy_walk_1.png"));
+            AndandoEsquerda.Add(g.Content.Load<Texture2D>("images/enemy_walk_2.png"));
+            AndandoEsquerda.Add(g.Content.Load<Texture2D>("images/enemy_walk_3.png"));
+            AndandoEsquerda.Add(g.Content.Load<Texture2D>("images/enemy_walk_4.png"));
+            AndandoEsquerda.Add(g.Content.Load<Texture2D>("images/enemy_walk_5.png"));
+            AndandoEsquerda.Add(g.Content.Load<Texture2D>("images/enemy_walk_6.png"));
             AndandoEsquerda.StartAnimation(100);
 
             obj = new Rectangle(l, t, w, h);
@@ -84,7 +79,7 @@ namespace NaziHunt
 
         }
 
-        public void Processar(GameTime gameTime, int time, List<TiroInimigo> elemento)
+        public void Processar(GameTime gameTime, int time, List<EnemyBullet> elemento)
         {
             elapsedTime += gameTime.ElapsedGameTime.Milliseconds;
 
@@ -96,7 +91,7 @@ namespace NaziHunt
                 if ((status == StatusInimigo.ATIRANDO_DIREITA) || (status == StatusInimigo.ATIRANDO_ESQUERDA))
                 {
 
-                    TiroInimigo tiroInimigo = new TiroInimigo(game);
+                    EnemyBullet tiroInimigo = new EnemyBullet(game);
                     elemento.Add(tiroInimigo);
                     tiroInimigo.Disparar(this);
 

@@ -3,14 +3,14 @@ using Microsoft.Xna.Framework;
 
 namespace NaziHunt
 {
-    class Caixa : ElementoJogo
+    class Crate : GameObject
     {
         Texture2D imagem;
 
-        public Caixa(Game1 g, int l, int t, int w, int h)
+        public Crate(Game g, int l, int t, int w, int h)
         {
             obj = new Rectangle(l, t, w, h);
-            imagem = g.Content.Load<Texture2D>("images/Crate.png");
+            imagem = g.Content.Load<Texture2D>("images/crate.png");
         }
 
         public void DesenharNaTela(SpriteBatch tela)

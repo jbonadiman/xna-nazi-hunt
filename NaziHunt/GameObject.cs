@@ -2,7 +2,7 @@
 
 namespace NaziHunt
 {
-    class ElementoJogo
+    class GameObject
     {
 
         public Rectangle obj;

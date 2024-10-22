@@ -14,7 +14,7 @@ namespace NaziHunt
         StatusMouse statusMouse;
         bool ja_clicou;
 
-        public MenuItem(Game1 g, String imagem_off, String imagem_on,  int x, int y, int w, int h)
+        public MenuItem(Game g, String imagem_off, String imagem_on, int x, int y, int w, int h)
         {
             obj_menu = new Rectangle(x, y, w, h);
             obj_mouse = new Rectangle(0, 0, 0, 0);

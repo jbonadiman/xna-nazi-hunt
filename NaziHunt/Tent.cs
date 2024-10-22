@@ -1,16 +1,17 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
 
+
 namespace NaziHunt
 {
-    class Chao : ElementoJogo
+    class Tent : GameObject
     {
-        private Texture2D imagem;
+        Texture2D imagem;
 
-        public Chao(Game1 g, int l, int t, int w, int h)
+        public Tent(Game g, int l, int t, int w, int h)
         {
-            obj = new Rectangle(l, t, w, h);
-            imagem = g.Content.Load<Texture2D>("images/chao.png");
+            obj = new Rectangle(l, t - 10, 615 / 2, 289 / 2);
+            imagem = g.Content.Load<Texture2D>("images/tent.png");
         }
 
         public void DesenharNaTela(SpriteBatch tela)
@@ -18,4 +19,5 @@ namespace NaziHunt
             tela.Draw(imagem, obj, Color.White);
         }
     }
-    }
+
+}

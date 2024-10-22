@@ -3,8 +3,9 @@ using Microsoft.Xna.Framework;
 
 namespace NaziHunt
 {
-    class Tiro
+    class EnemyBullet
     {
+
         private Texture2D tiro_esquerda, tiro_direita;
 
         public enum Sentido { PARADO, DIREITA, ESQUERDA };
@@ -17,19 +18,23 @@ namespace NaziHunt
 
         private int elapsedTime;
 
-        public Tiro(Game1 g)
+        Game game;
+
+        public EnemyBullet(Game g)
         {
-            tiro_direita = g.Content.Load<Texture2D>("images/tiro.png");
-            tiro_esquerda = Flip.FlipImage(g.Content.Load<Texture2D>("images/tiro.png"), false, true);
+            tiro_direita = g.Content.Load<Texture2D>("images/bullet.png");
+            tiro_esquerda = Flip.FlipImage(g.Content.Load<Texture2D>("images/bullet.png"), false, true);
             sentido = Sentido.PARADO;
             tiro_disparado = false;
-            obj = new Rectangle(0,  0, 10, 10);
+            obj = new Rectangle(0, 0, 10, 10);
             elapsedTime = 0;
+
+            game = g;
         }
 
-        public void Disparar(Personagem p)
+        public void Disparar(Enemy p)
         {
-            if ((p.status == Personagem.Status.PARADO_DIREITA) || (p.status == Personagem.Status.ATIRANDO_DIREITA) || (p.status == Personagem.Status.CORRENDO_DIREITA))
+            if ((p.status == Enemy.StatusInimigo.ANDANDO_DIREITA))
             {
                 if (!tiro_disparado)
                 {
@@ -40,7 +45,7 @@ namespace NaziHunt
                     tiro_disparado = true;
                 }
             }
-            else if ((p.status == Personagem.Status.PARADO_ESQUERDA) || (p.status == Personagem.Status.ATIRANDO_ESQUERDA) || (p.status == Personagem.Status.CORRENDO_ESQUERDA))
+            else if ((p.status == Enemy.StatusInimigo.ANDANDO_ESQUERDA))
 
             {
                 if (!tiro_disparado)
@@ -55,7 +60,7 @@ namespace NaziHunt
 
         }
 
-        public void Processar(GameTime gameTime, int time, List<ElementoJogo> elemento)
+        public void Processar(GameTime gameTime, int time, Player personagem)
         {
             elapsedTime += gameTime.ElapsedGameTime.Milliseconds;
 
@@ -66,18 +71,9 @@ namespace NaziHunt
                 {
                     obj.X += 15;
 
-                    for (int x = 0; x < elemento.Count; x++)
+                    if (obj.Intersects(personagem.obj))
                     {
-                        if (elemento[x] is Inimigo)
-                        {
-                            if (obj.Intersects(elemento[x].obj))
-                            {
-                                tiro_disparado = false;
-                                sentido = Sentido.PARADO;
-                                elemento.RemoveAt(x);
-                                x--;
-                            }
-                        }
+                        game.Exit();
                     }
 
                     if (obj.X > 800) //800 é a largura da tela em pixels
@@ -90,20 +86,11 @@ namespace NaziHunt
                 {
                     obj.X -= 15;
 
-
-                    for (int x = 0; x < elemento.Count; x++)
+                    if (obj.Intersects(personagem.obj))
                     {
-                        if (elemento[x] is Inimigo)
-                        {
-                            if (obj.Intersects(elemento[x].obj))
-                            {
-                                tiro_disparado = false;
-                                sentido = Sentido.PARADO;
-                                elemento.RemoveAt(x);
-                                x--;
-                            }
-                        }
+                        game.Exit();
                     }
+
 
                     if (obj.X < -obj.Width) //Sair da tela pela esquerda ?
                     {

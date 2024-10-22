@@ -6,19 +6,19 @@ using Microsoft.Xna.Framework.Audio;
 
 namespace NaziHunt
 {
-    class TelaFase1
+    class Stage1Screen
     {
 
-        Personagem personagem;
+        Player personagem;
 
-        List<ElementoJogo> aElemento;
+        List<GameObject> aElemento;
 
 
-       // Texture2D fundo;
+        // Texture2D fundo;
 
-        List<Tiro> aTiro;
+        List<Bullet> aTiro;
 
-        List<TiroInimigo> aTiroInimigo;
+        List<EnemyBullet> aTiroInimigo;
 
         Song musica;
 
@@ -26,39 +26,39 @@ namespace NaziHunt
 
         SoundEffect somTiro;
 
-        Tiro tiro;
+        Bullet tiro;
 
-        Inimigo inimigo;
+        Enemy inimigo;
 
         public int largura_tela, altura_tela;
 
-        Game1 game;
+        Game game;
 
-        FundoTela fundo, fundo2;
+        Background fundo, fundo2;
 
 
 
-      //  KeyboardState oldStateTeclado;
+        //  KeyboardState oldStateTeclado;
 
-        public TelaFase1(Game1 g)
+        public Stage1Screen(Game g)
         {
             //Score = 0;
             game = g;
             altura_tela = g.GraphicsDevice.Viewport.Height;
             largura_tela = g.GraphicsDevice.Viewport.Width;
-           // cont_inimigo = 0;
+            // cont_inimigo = 0;
 
             //fonte = g.Content.Load<SpriteFont>("SpriteFont1");
 
-            personagem = new Personagem(game, 300, altura_tela - 10 - 110, 90, 110);
+            personagem = new Player(game, 300, altura_tela - 10 - 110, 90, 110);
 
-            aElemento = new List<ElementoJogo>();
-            aTiro = new List<Tiro>();
-            aTiroInimigo = new List<TiroInimigo>();
+            aElemento = new List<GameObject>();
+            aTiro = new List<Bullet>();
+            aTiroInimigo = new List<EnemyBullet>();
 
 
-            musica = g.Content.Load<Song>("sounds/459121_At_Arms.mp3");
-            somTiro = g.Content.Load<SoundEffect>("sounds/37236__shades__gun-pistol-one-shot.wav");
+            musica = g.Content.Load<Song>("sounds/music.mp3");
+            somTiro = g.Content.Load<SoundEffect>("sounds/bullet.wav");
 
             MediaPlayer.Play(musica);
             MediaPlayer.IsRepeating = true;
@@ -67,10 +67,10 @@ namespace NaziHunt
             for (int x = 1; x <= 100; x++)
             {
 
-              aElemento.Add(new Chao(game, posx, altura_tela - 10, 131, 123));
-              //aSuporte.Add(new Suporte(game, 900, altura_tela - 221, 121, 157));
-             // aElemento.Add(new Suporte(game, posx, altura_tela - 221, 131, 157));
-              //aSuporte.Add(new Suporte(game, 0, altura_tela - 221, 121, 157));
+                aElemento.Add(new Ground(game, posx, altura_tela - 10, 131, 123));
+                //aSuporte.Add(new Suporte(game, 900, altura_tela - 221, 121, 157));
+                // aElemento.Add(new Suporte(game, posx, altura_tela - 221, 131, 157));
+                //aSuporte.Add(new Suporte(game, 0, altura_tela - 221, 121, 157));
 
                 //aElemento.Add(new FundoTela(game, posx, altura_tela - 100, 170, 49));
                 //aElemento.Add(new FundoTela(game, posx, altura_tela - 600, 500, 675));
@@ -79,15 +79,15 @@ namespace NaziHunt
                 posx += 131;
             }
 
-            fundo = new FundoTela(game, 0, 0, 800, 480);
-            fundo2 = new FundoTela(game, 800, 0, 800, 480);
+            fundo = new Background(game, 0, 0, 800, 480);
+            fundo2 = new Background(game, 800, 0, 800, 480);
             aElemento.Add(fundo);
             aElemento.Add(fundo2);
-            aElemento.Add(new Caixa(game, 900, 370, 100, 100));
-            aElemento.Add(new Inimigo(game, 1300, altura_tela - 10 - 110, 90, 110));
-            aElemento.Add(new Inimigo(game, 2000, altura_tela - 10 - 110, 90, 110));
-            aElemento.Add(new Inimigo(game, 2500, altura_tela - 10 - 110, 90, 110));
-            aElemento.Add(new Barraco(game, 3000, altura_tela - 10 - 110, 90, 110));
+            aElemento.Add(new Crate(game, 900, 370, 100, 100));
+            aElemento.Add(new Enemy(game, 1300, altura_tela - 10 - 110, 90, 110));
+            aElemento.Add(new Enemy(game, 2000, altura_tela - 10 - 110, 90, 110));
+            aElemento.Add(new Enemy(game, 2500, altura_tela - 10 - 110, 90, 110));
+            aElemento.Add(new Tent(game, 3000, altura_tela - 10 - 110, 90, 110));
 
 
             //inimigo = new Inimigo(game, 600, 50, 90, 110);
@@ -106,11 +106,11 @@ namespace NaziHunt
 
             for (int x = 0; x < aElemento.Count; x++)
             { //2
-                if (aElemento[x] is Barraco)
+                if (aElemento[x] is Tent)
 
                     if (personagem.obj.Intersects(aElemento[x].obj))
                         //Vai para a tela de créditos
-                        TelasDoJogo.status = TelasDoJogo.TelaJogo.TELA_CREDITOS;
+                        GameScreens.status = GameScreens.Screen.CREDITS;
 
             } //2
 
@@ -140,9 +140,9 @@ namespace NaziHunt
 
             for (int x = 0; x < aElemento.Count; x++)
             {
-                if (aElemento[x] is Inimigo)
+                if (aElemento[x] is Enemy)
 
-                    (aElemento[x] as Inimigo).Processar(gameTime, 30, aTiroInimigo);
+                    (aElemento[x] as Enemy).Processar(gameTime, 30, aTiroInimigo);
 
             }
 
@@ -198,7 +198,7 @@ namespace NaziHunt
             {
 
                 somTiro.Play();
-                Tiro tiro = new Tiro(game);
+                Bullet tiro = new Bullet(game);
                 aTiro.Add(tiro);
                 tiro.Disparar(personagem);
                 personagem.Atirar();
@@ -210,7 +210,7 @@ namespace NaziHunt
             oldStateTeclado = teclado;
         }
 
-            //1
+        //1
 
 
 
@@ -224,22 +224,22 @@ namespace NaziHunt
             //Desenha os suportes, se houver
             for (int x = 0; x < aElemento.Count; x++)
             {
-                if (aElemento[x] is Chao)
-                    (aElemento[x] as Chao).DesenharNaTela(tela);
-                else  if (aElemento[x] is Caixa)
+                if (aElemento[x] is Ground)
+                    (aElemento[x] as Ground).DesenharNaTela(tela);
+                else if (aElemento[x] is Crate)
                     //Desenha o chão
-                    (aElemento[x] as Caixa).DesenharNaTela(tela);
-                else if (aElemento[x] is FundoTela)
-                  (aElemento[x] as FundoTela).DesenharNaTela(tela);
-                     else if (aElemento[x] is Barraco)
-                  (aElemento[x] as Barraco).DesenharNaTela(tela);
-               else if (aElemento[x] is Inimigo)
-                    (aElemento[x] as Inimigo).DesenharNaTela(gameTime, tela);
+                    (aElemento[x] as Crate).DesenharNaTela(tela);
+                else if (aElemento[x] is Background)
+                    (aElemento[x] as Background).DesenharNaTela(tela);
+                else if (aElemento[x] is Tent)
+                    (aElemento[x] as Tent).DesenharNaTela(tela);
+                else if (aElemento[x] is Enemy)
+                    (aElemento[x] as Enemy).DesenharNaTela(gameTime, tela);
 
 
             }
 
-          //  inimigo.DesenharNaTela(gameTime, tela);
+            //  inimigo.DesenharNaTela(gameTime, tela);
 
             for (int x = 0; x < aTiro.Count; x++)
             {
@@ -254,19 +254,19 @@ namespace NaziHunt
             personagem.DesenharNaTela(gameTime, tela);
         }
 
-             //Desenha os suportes, se houver
-           /* for (int x = 0; x < aSuporte.Count; x++)
-            {
-                //Desenha o chão
-                ((Suporte)aSuporte[x]).DesenharNaTela(tela);
-            }
+        //Desenha os suportes, se houver
+        /* for (int x = 0; x < aSuporte.Count; x++)
+         {
+             //Desenha o chão
+             ((Suporte)aSuporte[x]).DesenharNaTela(tela);
+         }
 
-            personagem.DesenharNaTela(spriteBatch);
+         personagem.DesenharNaTela(spriteBatch);
 
-            spriteBatch.End();
+         spriteBatch.End();
 
-            base.Draw(gameTime);
-        }*/
+         base.Draw(gameTime);
+     }*/
 
 
         public void DeslocarCenario(int l)
@@ -287,7 +287,7 @@ namespace NaziHunt
             bool colidiu = false;
             for (int x = 0; x < aElemento.Count; x++)
             {
-                if(aElemento[x] is Caixa)
+                if (aElemento[x] is Crate)
                     if (personagem.obj.Intersects(aElemento[x].obj))
                     {
                         colidiu = true;
