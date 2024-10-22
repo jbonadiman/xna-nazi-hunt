@@ -1,16 +1,14 @@
-namespace NaziHunt
+namespace NaziHunt;
+
+public static class Program
 {
-    static class Program
+    /// <summary>
+    /// The main entry point for the application.
+    /// </summary>
+    public static void Main(string[] args)
     {
-        /// <summary>
-        /// The main entry point for the application.
-        /// </summary>
-        public static void Main(string[] args)
-        {
-            using (Game game = new Game())
-            {
-                game.Run();
-            }
-        }
+        using Game game = new();
+
+        game.Run();
     }
 }

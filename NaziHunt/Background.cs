@@ -1,21 +1,20 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
 
-namespace NaziHunt
+namespace NaziHunt;
+
+public class Background : GameObject
 {
-    class Background : GameObject
+    private Texture2D imagem;
+
+    public Background(Game g, int l, int t, int w, int h)
     {
-        private Texture2D imagem;
+        obj = new Rectangle(l, t, w, h);
+        imagem = g.Content.Load<Texture2D>("images/background.png");
+    }
 
-        public Background(Game g, int l, int t, int w, int h)
-        {
-            obj = new Rectangle(l, t, w, h);
-            imagem = g.Content.Load<Texture2D>("images/background.png");
-        }
-
-        public void DesenharNaTela(SpriteBatch tela)
-        {
-            tela.Draw(imagem, obj, Color.White);
-        }
+    public void DesenharNaTela(SpriteBatch tela)
+    {
+        tela.Draw(imagem, obj, Color.White);
     }
 }

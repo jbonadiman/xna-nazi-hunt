@@ -1,29 +1,23 @@
 ﻿using Microsoft.Xna.Framework;
 
-namespace NaziHunt
+namespace NaziHunt;
+
+public class GameObject
 {
-    class GameObject
+    public Rectangle obj;
+
+    public void DeslocarObjeto(int left)
     {
+        obj.X += left;
+    }
 
-        public Rectangle obj;
+    public void DeslocarObjetoX(int l)
+    {
+        obj.X += l;
+    }
 
-        public void DeslocarObjeto(int left)
-        {
-            obj.X += left;
-        }
-
-
-        public void DeslocarObjetoX(int l)
-        {
-            obj.X += l;
-        }
-
-        public void DeslocarObjetoY(int t)
-        {
-            obj.Y += t;
-        }
-
-
-
+    public void DeslocarObjetoY(int t)
+    {
+        obj.Y += t;
     }
 }
