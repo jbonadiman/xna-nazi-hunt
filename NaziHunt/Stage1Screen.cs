@@ -57,7 +57,7 @@ namespace NaziHunt
             aTiroInimigo = new List<EnemyBullet>();
 
 
-            musica = g.Content.Load<Song>("sounds/music.mp3");
+            musica = g.Content.Load<Song>("sounds/music.ogg");
             somTiro = g.Content.Load<SoundEffect>("sounds/bullet.wav");
 
             MediaPlayer.Play(musica);
