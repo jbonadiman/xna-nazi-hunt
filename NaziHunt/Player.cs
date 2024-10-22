@@ -25,9 +25,11 @@ public class Player
     public Rectangle obj;
     private int jumpCount;
     private int elapsedTime;
+    private readonly Game game;
 
     public Player(Game g, int l, int t, int w, int h)
     {
+        game = g;
         obj = new Rectangle(l, t, w, h);
         elapsedTime = 0;
         rightStopSprite = g.Content.Load<Texture2D>("images/player_jump_1.png");
@@ -145,29 +147,29 @@ public class Player
         }
     }
 
-    public void Draw(GameTime gameTime, SpriteBatch screen)
+    public void Draw(SpriteBatch screen)
     {
-
+        GameTime currentTime = game.CurrentTime;
         if ((currentState == State.RIGHT_STOP) || (currentState == State.LEFT_STOP))
         {
             screen.Draw(baseSprite, obj, Color.White);
         }
         else if (currentState == State.RIGHT_WALK)
         {
-            screen.Draw(rightWalk.GetImage(gameTime), obj, Color.White);
+            screen.Draw(rightWalk.GetImage(currentTime), obj, Color.White);
         }
         else if (currentState == State.LEFT_WALK)
         {
-            screen.Draw(leftWalk.GetImage(gameTime), obj, Color.White);
+            screen.Draw(leftWalk.GetImage(currentTime), obj, Color.White);
         }
 
         if (currentState == State.LEFT_JUMP)
         {
-            screen.Draw(leftJump.GetImage(gameTime), obj, Color.White);
+            screen.Draw(leftJump.GetImage(currentTime), obj, Color.White);
         }
         else if (currentState == State.RIGHT_JUMP)
         {
-            screen.Draw(rightJump.GetImage(gameTime), obj, Color.White);
+            screen.Draw(rightJump.GetImage(currentTime), obj, Color.White);
         }
         else if (currentState == State.RIGHT_SHOOT)
         {

@@ -71,7 +71,7 @@ public class Enemy : GameObject
         shootElapsedTime = 0;
     }
 
-    public void Processar(GameTime gameTime, int time, List<EnemyBullet> bullets)
+    public void Update(GameTime gameTime, int time, List<EnemyBullet> bullets)
     {
         elapsedTime += gameTime.ElapsedGameTime.Milliseconds;
 
@@ -106,15 +106,17 @@ public class Enemy : GameObject
         }
     }
 
-    public void Draw(GameTime gameTime, SpriteBatch screen)
+    public void Draw(SpriteBatch screen)
     {
+        GameTime currentTime = game.CurrentTime;
+
         if (state == EnemyState.RIGHT_WALK)
         {
-            screen.Draw(rightWalk.GetImage(gameTime), rect, Color.White);
+            screen.Draw(rightWalk.GetImage(currentTime), rect, Color.White);
         }
         else if (state == EnemyState.LEFT_WALK)
         {
-            screen.Draw(leftWalk.GetImage(gameTime), rect, Color.White);
+            screen.Draw(leftWalk.GetImage(currentTime), rect, Color.White);
         }
         else if (state == EnemyState.RIGHT_SHOOT)
         {

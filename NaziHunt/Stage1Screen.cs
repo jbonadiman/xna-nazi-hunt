@@ -115,7 +115,7 @@ public class Stage1Screen
         {
             if (gameObjects[x] is Enemy)
             {
-                (gameObjects[x] as Enemy).Processar(gameTime, 30, enemyBullets);
+                (gameObjects[x] as Enemy).Update(gameTime, 30, enemyBullets);
             }
         }
 
@@ -183,7 +183,7 @@ public class Stage1Screen
         keyboardOldState = keyboard;
     }
 
-    public void Draw(GameTime gameTime, SpriteBatch screen)
+    public void Draw(SpriteBatch screen)
     {
         //Adiciona vários blocos de cerca
         //Desenha os suportes, se houver
@@ -208,7 +208,7 @@ public class Stage1Screen
             }
             else if (gameObjects[x] is Enemy)
             {
-                (gameObjects[x] as Enemy).Draw(gameTime, screen);
+                (gameObjects[x] as Enemy).Draw(screen);
             }
         }
 
@@ -223,7 +223,7 @@ public class Stage1Screen
             enemyBullets[x].Draw(screen);
         }
 
-        player.Draw(gameTime, screen);
+        player.Draw(screen);
     }
 
     //Desenha os suportes, se houver

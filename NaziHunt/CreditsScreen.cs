@@ -9,17 +9,19 @@ public class CreditsScreen : GameObject
     //MenuItem iniciar_jogo, sair;
 
     //MouseState mouse;
+    private readonly Game game;
 
     public CreditsScreen(Game g)
     {
+        game = g;
         credits = g.Content.Load<Texture2D>("images/credits.png");
     }
 
-    public void Draw(SpriteBatch screen, GraphicsDevice graphics)
+    public void Draw(SpriteBatch screen)
     {
         screen.Draw(
             credits,
-            new Rectangle(graphics.Viewport.Width / 2 - 238 / 2, graphics.Viewport.Height / 2 - 289 / 2, 238, 289),
+            new Rectangle(game.ViewportWidth / 2 - 238 / 2, game.ViewportHeight / 2 - 289 / 2, 238, 289),
             Color.White);
         //iniciar_jogo.DesenharNaTela(tela);
         //  continuar.DesenharNaTela(tela);

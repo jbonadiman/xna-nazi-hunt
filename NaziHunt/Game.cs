@@ -16,6 +16,11 @@ public class Game : Microsoft.Xna.Framework.Game
     Stage1Screen stage1Screen;
     CreditsScreen creditsScreen;
 
+    public GameTime CurrentTime { get; private set; }
+
+    public int ViewportWidth => GraphicsDevice.Viewport.Width;
+    public int ViewportHeight => GraphicsDevice.Viewport.Height;
+
     public Game()
     {
         Content.RootDirectory = "Content";
@@ -79,6 +84,7 @@ public class Game : Microsoft.Xna.Framework.Game
     /// <param name="gameTime">Provides a snapshot of timing values.</param>
     protected override void Update(GameTime gameTime)
     {
+        CurrentTime = gameTime;
         // Allows the game to exit
         if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
         {
@@ -119,11 +125,11 @@ public class Game : Microsoft.Xna.Framework.Game
         }
         else if (GameScreens.CurrentScreen == GameScreens.Screen.STAGE1)
         {
-            stage1Screen.Draw(gameTime, spriteBatch);
+            stage1Screen.Draw(spriteBatch);
         }
         else if (GameScreens.CurrentScreen == GameScreens.Screen.CREDITS)
         {
-            creditsScreen.Draw(spriteBatch, GraphicsDevice);
+            creditsScreen.Draw(spriteBatch);
         }
 
         spriteBatch.End();
