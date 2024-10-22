@@ -5,31 +5,36 @@ namespace NaziHunt;
 
 public class Enemy : GameObject
 {
-    AnimationSprites AndandoDireita, AndandoEsquerda;
-    public enum StatusInimigo { ANDANDO_DIREITA, ANDANDO_ESQUERDA, ATIRANDO_ESQUERDA, ATIRANDO_DIREITA }
-    public StatusInimigo status;
-    Texture2D atirando_esquerda, atirando_direita;
-    int elapsedTimeTiro;
-    int elapsedTime;
-    EnemyBullet tiroInimigo;
-    Game game;
+    public enum EnemyState
+    {
+        RIGHT_WALK, LEFT_WALK, LEFT_SHOOT, RIGHT_SHOOT
+    }
+    public EnemyState state;
 
-    public void Atirar(GameTime gameTime)
+    private readonly AnimationSprites rightWalk;
+    private readonly AnimationSprites leftWalk;
+    private readonly Texture2D leftShoot;
+    private readonly Texture2D rightShoot;
+    int shootElapsedTime;
+    int elapsedTime;
+    readonly Game game;
+
+    public void Shoot(GameTime gameTime)
     {
         //Atira a cada 3 segundos
-        elapsedTimeTiro += gameTime.ElapsedGameTime.Milliseconds;
-        if (elapsedTimeTiro >= 3000)
+        shootElapsedTime += gameTime.ElapsedGameTime.Milliseconds;
+        if (shootElapsedTime >= 3000)
         {
-            if (status == StatusInimigo.ANDANDO_DIREITA)
+            if (state == EnemyState.RIGHT_WALK)
             {
-                status = StatusInimigo.ATIRANDO_DIREITA;
+                state = EnemyState.RIGHT_SHOOT;
             }
-            else if (status == StatusInimigo.ANDANDO_ESQUERDA)
+            else if (state == EnemyState.LEFT_WALK)
             {
-                status = StatusInimigo.ATIRANDO_ESQUERDA;
+                state = EnemyState.LEFT_SHOOT;
             }
 
-            elapsedTimeTiro = 0;
+            shootElapsedTime = 0;
         }
     }
 
@@ -37,87 +42,87 @@ public class Enemy : GameObject
     {
         game = g;
 
-        atirando_direita = Flip.FlipImage(g.Content.Load<Texture2D>("images/enemy_shoot.png"), false, true);
-        atirando_esquerda = g.Content.Load<Texture2D>("images/enemy_shoot.png");
+        rightShoot = Flip.FlipImage(g.Content.Load<Texture2D>("images/enemy_shoot.png"), false, true);
+        leftShoot = g.Content.Load<Texture2D>("images/enemy_shoot.png");
 
-        AndandoDireita = new AnimationSprites();
+        rightWalk = new AnimationSprites();
         //       AndandoDireita.Add(Flip.FlipImage(g.Content.Load<Texture2D>("images/inimigo_andando_1.png"), false, true));
-        AndandoDireita.Add(Flip.FlipImage(g.Content.Load<Texture2D>("images/enemy_walk_2.png"), false, true));
-        AndandoDireita.Add(Flip.FlipImage(g.Content.Load<Texture2D>("images/enemy_walk_3.png"), false, true));
-        AndandoDireita.Add(Flip.FlipImage(g.Content.Load<Texture2D>("images/enemy_walk_4.png"), false, true));
-        AndandoDireita.Add(Flip.FlipImage(g.Content.Load<Texture2D>("images/enemy_walk_5.png"), false, true));
-        AndandoDireita.Add(Flip.FlipImage(g.Content.Load<Texture2D>("images/enemy_walk_6.png"), false, true));
-        AndandoDireita.StartAnimation(100);
+        rightWalk.Add(Flip.FlipImage(g.Content.Load<Texture2D>("images/enemy_walk_2.png"), false, true));
+        rightWalk.Add(Flip.FlipImage(g.Content.Load<Texture2D>("images/enemy_walk_3.png"), false, true));
+        rightWalk.Add(Flip.FlipImage(g.Content.Load<Texture2D>("images/enemy_walk_4.png"), false, true));
+        rightWalk.Add(Flip.FlipImage(g.Content.Load<Texture2D>("images/enemy_walk_5.png"), false, true));
+        rightWalk.Add(Flip.FlipImage(g.Content.Load<Texture2D>("images/enemy_walk_6.png"), false, true));
+        rightWalk.StartAnimation(100);
 
-        AndandoEsquerda = new AnimationSprites();
+        leftWalk = new AnimationSprites();
         //     AndandoEsquerda.Add(g.Content.Load<Texture2D>("images/enemy_walk_1.png"));
-        AndandoEsquerda.Add(g.Content.Load<Texture2D>("images/enemy_walk_2.png"));
-        AndandoEsquerda.Add(g.Content.Load<Texture2D>("images/enemy_walk_3.png"));
-        AndandoEsquerda.Add(g.Content.Load<Texture2D>("images/enemy_walk_4.png"));
-        AndandoEsquerda.Add(g.Content.Load<Texture2D>("images/enemy_walk_5.png"));
-        AndandoEsquerda.Add(g.Content.Load<Texture2D>("images/enemy_walk_6.png"));
-        AndandoEsquerda.StartAnimation(100);
+        leftWalk.Add(g.Content.Load<Texture2D>("images/enemy_walk_2.png"));
+        leftWalk.Add(g.Content.Load<Texture2D>("images/enemy_walk_3.png"));
+        leftWalk.Add(g.Content.Load<Texture2D>("images/enemy_walk_4.png"));
+        leftWalk.Add(g.Content.Load<Texture2D>("images/enemy_walk_5.png"));
+        leftWalk.Add(g.Content.Load<Texture2D>("images/enemy_walk_6.png"));
+        leftWalk.StartAnimation(100);
 
-        obj = new Rectangle(l, t, w, h);
+        rect = new Rectangle(l, t, w, h);
 
-        status = StatusInimigo.ANDANDO_ESQUERDA;
+        state = EnemyState.LEFT_WALK;
 
         elapsedTime = 0;
-        elapsedTimeTiro = 0;
+        shootElapsedTime = 0;
     }
 
-    public void Processar(GameTime gameTime, int time, List<EnemyBullet> elemento)
+    public void Processar(GameTime gameTime, int time, List<EnemyBullet> bullets)
     {
         elapsedTime += gameTime.ElapsedGameTime.Milliseconds;
 
-        Atirar(gameTime);
+        Shoot(gameTime);
 
         if (elapsedTime >= time)
         {
             elapsedTime = 0;
-            if ((status == StatusInimigo.ATIRANDO_DIREITA) || (status == StatusInimigo.ATIRANDO_ESQUERDA))
+            if ((state == EnemyState.RIGHT_SHOOT) || (state == EnemyState.LEFT_SHOOT))
             {
-                EnemyBullet tiroInimigo = new EnemyBullet(game);
-                elemento.Add(tiroInimigo);
-                tiroInimigo.Disparar(this);
+                EnemyBullet enemyBullet = new EnemyBullet(game);
+                bullets.Add(enemyBullet);
+                enemyBullet.Shoot(this);
 
-                if (status == StatusInimigo.ATIRANDO_DIREITA)
+                if (state == EnemyState.RIGHT_SHOOT)
                 {
-                    status = StatusInimigo.ANDANDO_DIREITA;
+                    state = EnemyState.RIGHT_WALK;
                 }
-                else if (status == StatusInimigo.ATIRANDO_ESQUERDA)
+                else if (state == EnemyState.LEFT_SHOOT)
                 {
-                    status = StatusInimigo.ANDANDO_ESQUERDA;
+                    state = EnemyState.LEFT_WALK;
                 }
             }
-            else if (status == StatusInimigo.ANDANDO_DIREITA)
+            else if (state == EnemyState.RIGHT_WALK)
             {
-                obj.X += 5;
+                rect.X += 5;
             }
-            else if (status == StatusInimigo.ANDANDO_ESQUERDA)
+            else if (state == EnemyState.LEFT_WALK)
             {
-                obj.X -= 5;
+                rect.X -= 5;
             }
         }
     }
 
-    public void DesenharNaTela(GameTime gameTime, SpriteBatch tela)
+    public void Draw(GameTime gameTime, SpriteBatch screen)
     {
-        if (status == StatusInimigo.ANDANDO_DIREITA)
+        if (state == EnemyState.RIGHT_WALK)
         {
-            tela.Draw(AndandoDireita.getImage(gameTime), obj, Color.White);
+            screen.Draw(rightWalk.GetImage(gameTime), rect, Color.White);
         }
-        else if (status == StatusInimigo.ANDANDO_ESQUERDA)
+        else if (state == EnemyState.LEFT_WALK)
         {
-            tela.Draw(AndandoEsquerda.getImage(gameTime), obj, Color.White);
+            screen.Draw(leftWalk.GetImage(gameTime), rect, Color.White);
         }
-        else if (status == StatusInimigo.ATIRANDO_DIREITA)
+        else if (state == EnemyState.RIGHT_SHOOT)
         {
-            tela.Draw(atirando_direita, obj, Color.White);
+            screen.Draw(rightShoot, rect, Color.White);
         }
-        else if (status == StatusInimigo.ATIRANDO_ESQUERDA)
+        else if (state == EnemyState.LEFT_SHOOT)
         {
-            tela.Draw(atirando_esquerda, obj, Color.White);
+            screen.Draw(leftShoot, rect, Color.White);
         }
     }
 }

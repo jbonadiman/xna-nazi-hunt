@@ -5,16 +5,16 @@ namespace NaziHunt;
 
 public class Tent : GameObject
 {
-    Texture2D imagem;
+    Texture2D sprite;
 
     public Tent(Game g, int l, int t, int w, int h)
     {
-        obj = new Rectangle(l, t - 10, 615 / 2, 289 / 2);
-        imagem = g.Content.Load<Texture2D>("images/tent.png");
+        rect = new Rectangle(l, t - 10, 615 / 2, 289 / 2);
+        sprite = g.Content.Load<Texture2D>("images/tent.png");
     }
 
-    public void DesenharNaTela(SpriteBatch tela)
+    public void Draw(SpriteBatch screen)
     {
-        tela.Draw(imagem, obj, Color.White);
+        screen.Draw(sprite, rect, Color.White);
     }
 }

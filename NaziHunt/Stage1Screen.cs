@@ -8,19 +8,17 @@ namespace NaziHunt;
 
 public class Stage1Screen
 {
-    Player personagem;
-    List<GameObject> aElemento;
+    readonly Player player;
+    readonly List<GameObject> gameObjects;
     // Texture2D fundo;
-    List<Bullet> aTiro;
-    List<EnemyBullet> aTiroInimigo;
-    Song musica;
-    KeyboardState oldStateTeclado;
-    SoundEffect somTiro;
-    Bullet tiro;
-    Enemy inimigo;
-    public int largura_tela, altura_tela;
+    readonly List<Bullet> bullets;
+    readonly List<EnemyBullet> enemyBullets;
+    readonly Song song;
+    KeyboardState keyboardOldState;
+    readonly SoundEffect bulletSound;
+    public int screenWidth, screenHeight;
     Game game;
-    Background fundo, fundo2;
+    Background background, background2;
 
     //  KeyboardState oldStateTeclado;
 
@@ -28,27 +26,26 @@ public class Stage1Screen
     {
         //Score = 0;
         game = g;
-        altura_tela = g.GraphicsDevice.Viewport.Height;
-        largura_tela = g.GraphicsDevice.Viewport.Width;
+        screenHeight = g.GraphicsDevice.Viewport.Height;
+        screenWidth = g.GraphicsDevice.Viewport.Width;
         // cont_inimigo = 0;
         //fonte = g.Content.Load<SpriteFont>("SpriteFont1");
-        personagem = new Player(game, 300, altura_tela - 10 - 110, 90, 110);
+        player = new Player(game, 300, screenHeight - 10 - 110, 90, 110);
 
-        aElemento = new List<GameObject>();
-        aTiro = new List<Bullet>();
-        aTiroInimigo = new List<EnemyBullet>();
+        gameObjects = [];
+        bullets = [];
+        enemyBullets = [];
 
-        musica = g.Content.Load<Song>("sounds/music.ogg");
-        somTiro = g.Content.Load<SoundEffect>("sounds/bullet.wav");
+        song = g.Content.Load<Song>("sounds/music.ogg");
+        bulletSound = g.Content.Load<SoundEffect>("sounds/bullet.wav");
 
-        MediaPlayer.Play(musica);
+        MediaPlayer.Play(song);
         MediaPlayer.IsRepeating = true;
 
         int posx = 0;
         for (int x = 1; x <= 100; x++)
         {
-
-            aElemento.Add(new Ground(game, posx, altura_tela - 10, 131, 123));
+            gameObjects.Add(new Ground(game, posx, screenHeight - 10, 131, 123));
             //aSuporte.Add(new Suporte(game, 900, altura_tela - 221, 121, 157));
             // aElemento.Add(new Suporte(game, posx, altura_tela - 221, 131, 157));
             //aSuporte.Add(new Suporte(game, 0, altura_tela - 221, 121, 157));
@@ -58,15 +55,15 @@ public class Stage1Screen
             posx += 131;
         }
 
-        fundo = new Background(game, 0, 0, 800, 480);
-        fundo2 = new Background(game, 800, 0, 800, 480);
-        aElemento.Add(fundo);
-        aElemento.Add(fundo2);
-        aElemento.Add(new Crate(game, 900, 370, 100, 100));
-        aElemento.Add(new Enemy(game, 1300, altura_tela - 10 - 110, 90, 110));
-        aElemento.Add(new Enemy(game, 2000, altura_tela - 10 - 110, 90, 110));
-        aElemento.Add(new Enemy(game, 2500, altura_tela - 10 - 110, 90, 110));
-        aElemento.Add(new Tent(game, 3000, altura_tela - 10 - 110, 90, 110));
+        background = new Background(game, 0, 0, 800, 480);
+        background2 = new Background(game, 800, 0, 800, 480);
+        gameObjects.Add(background);
+        gameObjects.Add(background2);
+        gameObjects.Add(new Crate(game, 900, 370, 100, 100));
+        gameObjects.Add(new Enemy(game, 1300, screenHeight - 10 - 110, 90, 110));
+        gameObjects.Add(new Enemy(game, 2000, screenHeight - 10 - 110, 90, 110));
+        gameObjects.Add(new Enemy(game, 2500, screenHeight - 10 - 110, 90, 110));
+        gameObjects.Add(new Tent(game, 3000, screenHeight - 10 - 110, 90, 110));
 
         //inimigo = new Inimigo(game, 600, 50, 90, 110);
         //for (int x = 1; x <= 20; x++)
@@ -77,156 +74,156 @@ public class Stage1Screen
         //}
     }
 
-    public void Update(GameTime gameTime, KeyboardState teclado)
+    public void Update(GameTime gameTime, KeyboardState keyboard)
     { //1
-        for (int x = 0; x < aElemento.Count; x++)
+        for (int x = 0; x < gameObjects.Count; x++)
         { //2
-            if (aElemento[x] is Tent)
+            if (gameObjects[x] is Tent)
             {
-                if (personagem.obj.Intersects(aElemento[x].obj))
+                if (player.obj.Intersects(gameObjects[x].rect))
                 //Vai para a tela de créditos
                 {
-                    GameScreens.status = GameScreens.Screen.CREDITS;
+                    GameScreens.CurrentScreen = GameScreens.Screen.CREDITS;
                 }
             }
         } //2
 
-        for (int x = 0; x < aTiro.Count; x++)
+        for (int x = 0; x < bullets.Count; x++)
         {
             //Tiro do personagem
-            aTiro[x].Processar(gameTime, 30, aElemento);
-            if (!aTiro[x].tiro_disparado)
+            bullets[x].Update(gameTime, 30, gameObjects);
+            if (!bullets[x].shotFired)
             {
-                aTiro.RemoveAt(x);
+                bullets.RemoveAt(x);
                 x--;
             }
         }
 
-        for (int x = 0; x < aTiroInimigo.Count; x++)
+        for (int x = 0; x < enemyBullets.Count; x++)
         {
             //Tiro do personagem
-            aTiroInimigo[x].Processar(gameTime, 30, personagem);
+            enemyBullets[x].Update(gameTime, 30, player);
 
-            if (!aTiroInimigo[x].tiro_disparado)
+            if (!enemyBullets[x].isShotFired)
             {
-                aTiroInimigo.RemoveAt(x);
+                enemyBullets.RemoveAt(x);
                 x--;
             }
         }
 
-        for (int x = 0; x < aElemento.Count; x++)
+        for (int x = 0; x < gameObjects.Count; x++)
         {
-            if (aElemento[x] is Enemy)
+            if (gameObjects[x] is Enemy)
             {
-                (aElemento[x] as Enemy).Processar(gameTime, 30, aTiroInimigo);
+                (gameObjects[x] as Enemy).Processar(gameTime, 30, enemyBullets);
             }
         }
 
-        personagem.Processar(gameTime, 30, aElemento);
-        if (teclado.IsKeyDown(Keys.Right))
+        player.Update(gameTime, 30, gameObjects);
+        if (keyboard.IsKeyDown(Keys.Right))
         {
-            personagem.MoverParaDireita();
-            DeslocarCenario(-7);
+            player.MoveToTheRight();
+            ShiftStage(-7);
 
             //Checa a colisao da caixa
-            if (checarColisaoCaixa())
+            if (checkCrateCollision())
             {
-                DeslocarCenario(7);
+                ShiftStage(7);
             }
 
-            if (fundo.obj.X < -800)
+            if (background.rect.X < -800)
             {
-                fundo.obj.X = fundo2.obj.X + 800;
+                background.rect.X = background2.rect.X + 800;
             }
-            if (fundo2.obj.X < -800)
+            if (background2.rect.X < -800)
             {
-                fundo2.obj.X = fundo.obj.X + 800;
+                background2.rect.X = background.rect.X + 800;
             }
         }
-        else if (teclado.IsKeyDown(Keys.Left))
+        else if (keyboard.IsKeyDown(Keys.Left))
         {
-            personagem.MoverParaEsquerda();
-            DeslocarCenario(7);
+            player.MoveToTheLeft();
+            ShiftStage(7);
 
             //Checa a colisao da caixa
-            if (checarColisaoCaixa())
+            if (checkCrateCollision())
             {
-                DeslocarCenario(-7);
+                ShiftStage(-7);
             }
 
 
-            if (fundo.obj.X > 800)
+            if (background.rect.X > 800)
             {
-                fundo.obj.X = fundo2.obj.X - 800;
+                background.rect.X = background2.rect.X - 800;
             }
-            if (fundo2.obj.X > 800)
+            if (background2.rect.X > 800)
             {
-                fundo2.obj.X = fundo.obj.X - 800;
+                background2.rect.X = background.rect.X - 800;
             }
         }
 
-        else if (teclado.IsKeyDown(Keys.Up))
+        else if (keyboard.IsKeyDown(Keys.Up))
         {
-            personagem.Pular();
+            player.Jump();
         }
         else
         {
-            personagem.Parar();
+            player.Stop();
         }
 
-        if ((teclado.IsKeyDown(Keys.Space)) && (!oldStateTeclado.IsKeyDown(Keys.Space)))
+        if ((keyboard.IsKeyDown(Keys.Space)) && (!keyboardOldState.IsKeyDown(Keys.Space)))
         {
-            somTiro.Play();
+            bulletSound.Play();
             Bullet tiro = new Bullet(game);
-            aTiro.Add(tiro);
-            tiro.Disparar(personagem);
-            personagem.Atirar();
+            bullets.Add(tiro);
+            tiro.Shoot(player);
+            player.Shoot();
         }
 
-        oldStateTeclado = teclado;
+        keyboardOldState = keyboard;
     }
 
-    public void Draw(GameTime gameTime, SpriteBatch tela)
+    public void Draw(GameTime gameTime, SpriteBatch screen)
     {
         //Adiciona vários blocos de cerca
         //Desenha os suportes, se houver
-        for (int x = 0; x < aElemento.Count; x++)
+        for (int x = 0; x < gameObjects.Count; x++)
         {
-            if (aElemento[x] is Ground)
+            if (gameObjects[x] is Ground)
             {
-                (aElemento[x] as Ground).DesenharNaTela(tela);
+                (gameObjects[x] as Ground).Draw(screen);
             }
-            else if (aElemento[x] is Crate)
+            else if (gameObjects[x] is Crate)
             //Desenha o chão
             {
-                (aElemento[x] as Crate).DesenharNaTela(tela);
+                (gameObjects[x] as Crate).Draw(screen);
             }
-            else if (aElemento[x] is Background)
+            else if (gameObjects[x] is Background)
             {
-                (aElemento[x] as Background).DesenharNaTela(tela);
+                (gameObjects[x] as Background).Draw(screen);
             }
-            else if (aElemento[x] is Tent)
+            else if (gameObjects[x] is Tent)
             {
-                (aElemento[x] as Tent).DesenharNaTela(tela);
+                (gameObjects[x] as Tent).Draw(screen);
             }
-            else if (aElemento[x] is Enemy)
+            else if (gameObjects[x] is Enemy)
             {
-                (aElemento[x] as Enemy).DesenharNaTela(gameTime, tela);
+                (gameObjects[x] as Enemy).Draw(gameTime, screen);
             }
         }
 
         //  inimigo.DesenharNaTela(gameTime, tela);
-        for (int x = 0; x < aTiro.Count; x++)
+        for (int x = 0; x < bullets.Count; x++)
         {
-            aTiro[x].DesenharNaTela(tela);
+            bullets[x].Draw(screen);
         }
 
-        for (int x = 0; x < aTiroInimigo.Count; x++)
+        for (int x = 0; x < enemyBullets.Count; x++)
         {
-            aTiroInimigo[x].DesenharNaTela(tela);
+            enemyBullets[x].Draw(screen);
         }
 
-        personagem.DesenharNaTela(gameTime, tela);
+        player.Draw(gameTime, screen);
     }
 
     //Desenha os suportes, se houver
@@ -243,11 +240,11 @@ public class Stage1Screen
      base.Draw(gameTime);
  }*/
 
-    public void DeslocarCenario(int l)
+    public void ShiftStage(int l)
     {
-        for (int x = 0; x < aElemento.Count; x++)
+        for (int x = 0; x < gameObjects.Count; x++)
         {
-            aElemento[x].DeslocarObjetoX(l);
+            gameObjects[x].MoveOnX(l);
         }
         //Desloca suportes, se houver
         /*for (int x = 0; x < aSuporte.Count; x++)
@@ -256,19 +253,19 @@ public class Stage1Screen
         }*/
     }
 
-    public bool checarColisaoCaixa()
+    public bool checkCrateCollision()
     {
-        bool colidiu = false;
-        for (int x = 0; x < aElemento.Count; x++)
+        bool collided = false;
+        for (int x = 0; x < gameObjects.Count; x++)
         {
-            if (aElemento[x] is Crate)
-                if (personagem.obj.Intersects(aElemento[x].obj))
+            if (gameObjects[x] is Crate)
+                if (player.obj.Intersects(gameObjects[x].rect))
                 {
-                    colidiu = true;
+                    collided = true;
                     break;
                 }
         }
 
-        return colidiu;
+        return collided;
     }
 }

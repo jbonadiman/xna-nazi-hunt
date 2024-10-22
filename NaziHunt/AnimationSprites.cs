@@ -5,22 +5,19 @@ namespace NaziHunt;
 
 public class AnimationSprites
 {
-    private List<Texture2D> aImagens;
-
+    private readonly IList<Texture2D> frames;
     private int elapsedTime;
-
     private int time;
-
     private int index;
 
     public AnimationSprites()
     {
-        aImagens = new List<Texture2D>();
+        frames = [];
     }
 
     public void Add(Texture2D item)
     {
-        aImagens.Add(item);
+        frames.Add(item);
     }
 
     public void StartAnimation(int t)
@@ -29,7 +26,7 @@ public class AnimationSprites
         elapsedTime = index = 0;
     }
 
-    public Texture2D getImage(GameTime gameTime)
+    public Texture2D GetImage(GameTime gameTime)
     {
         elapsedTime += gameTime.ElapsedGameTime.Milliseconds;
 
@@ -37,10 +34,12 @@ public class AnimationSprites
         {
             elapsedTime = 0;
             index++;
-            if (index == aImagens.Count)
+            if (index == frames.Count)
+            {
                 index = 0;
+            }
         }
 
-        return aImagens[index];
+        return frames[index];
     }
 }

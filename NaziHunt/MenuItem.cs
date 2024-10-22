@@ -6,52 +6,53 @@ namespace NaziHunt;
 
 public class MenuItem
 {
-    Texture2D menu_item_off, menu_item_on;
-    Rectangle obj_menu, obj_mouse;
-    enum StatusMouse { DENTRO, FORA }
-    StatusMouse statusMouse;
-    bool ja_clicou;
+    private readonly Texture2D menuItemOff;
+    private readonly Texture2D menuItemOn;
+    private StatusMouse currentMouseStatus;
+    Rectangle menuRect, mouseRect;
+    enum StatusMouse { OUTSIDE, INSIDE }
+    bool wasClicked;
 
-    public MenuItem(Game g, String imagem_off, String imagem_on, int x, int y, int w, int h)
+    public MenuItem(Game g, string pathSpriteOff, string pathSpriteOn, int x, int y, int w, int h)
     {
-        obj_menu = new Rectangle(x, y, w, h);
-        obj_mouse = new Rectangle(0, 0, 0, 0);
-        menu_item_off = g.Content.Load<Texture2D>(imagem_off);
-        menu_item_on = g.Content.Load<Texture2D>(imagem_on);
-        ja_clicou = false;
+        menuRect = new Rectangle(x, y, w, h);
+        mouseRect = new Rectangle(0, 0, 0, 0);
+        menuItemOff = g.Content.Load<Texture2D>(pathSpriteOff);
+        menuItemOn = g.Content.Load<Texture2D>(pathSpriteOn);
+        wasClicked = false;
 
-        statusMouse = StatusMouse.FORA;
+        currentMouseStatus = StatusMouse.INSIDE;
     }
 
     public void CheckMouseOver(MouseState m)
     {
-        obj_mouse.X = m.X;
-        obj_mouse.Y = m.Y;
-        obj_mouse.Width = 32;
-        obj_mouse.Height = 32;
+        mouseRect.X = m.X;
+        mouseRect.Y = m.Y;
+        mouseRect.Width = 32;
+        mouseRect.Height = 32;
 
-        if (obj_mouse.Intersects(obj_menu))
+        if (mouseRect.Intersects(menuRect))
         {
-            statusMouse = StatusMouse.DENTRO;
+            currentMouseStatus = StatusMouse.OUTSIDE;
         }
         else
         {
-            statusMouse = StatusMouse.FORA;
+            currentMouseStatus = StatusMouse.INSIDE;
         }
     }
 
-    public bool Clicou(MouseState m)
+    public bool WasClicked(MouseState m)
     {
-        obj_mouse.X = m.X;
-        obj_mouse.Y = m.Y;
-        obj_mouse.Width = 50;
-        obj_mouse.Height = 50;
+        mouseRect.X = m.X;
+        mouseRect.Y = m.Y;
+        mouseRect.Width = 50;
+        mouseRect.Height = 50;
         if (m.LeftButton == ButtonState.Pressed)
         {
-            if (!ja_clicou)
+            if (!wasClicked)
             {
-                ja_clicou = true;
-                if (obj_mouse.Intersects(obj_menu))
+                wasClicked = true;
+                if (mouseRect.Intersects(menuRect))
                 {
                     return true;
                 }
@@ -67,20 +68,20 @@ public class MenuItem
         }
         else
         {
-            ja_clicou = false;
+            wasClicked = false;
             return false;
         }
     }
 
-    public void DesenharNaTela(SpriteBatch tela)
+    public void Draw(SpriteBatch screen)
     {
-        if (statusMouse == StatusMouse.DENTRO)
+        if (currentMouseStatus == StatusMouse.OUTSIDE)
         {
-            tela.Draw(menu_item_on, obj_menu, Color.White);
+            screen.Draw(menuItemOn, menuRect, Color.White);
         }
         else
         {
-            tela.Draw(menu_item_off, obj_menu, Color.White);
+            screen.Draw(menuItemOff, menuRect, Color.White);
         }
     }
 }

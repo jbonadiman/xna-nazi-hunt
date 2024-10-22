@@ -5,246 +5,253 @@ namespace NaziHunt;
 
 public class Player
 {
-    public enum Status
+    public enum State
     {
-        PARADO_ESQUERDA,
-        PARADO_DIREITA,
-        CORRENDO_ESQUERDA,
-        CORRENDO_DIREITA,
-        PULANDO_ESQUERDA,
-        PULANDO_DIREITA,
-        ATIRANDO_DIREITA,
-        ATIRANDO_ESQUERDA
+        LEFT_STOP,
+        RIGHT_STOP,
+        LEFT_WALK,
+        RIGHT_WALK,
+        LEFT_JUMP,
+        RIGHT_JUMP,
+        RIGHT_SHOOT,
+        LEFT_SHOOT
     }
 
-    public enum StatusSolo { NO_CHAO, CAINDO, SUBINDO };
-    public StatusSolo status_solo;
-    private AnimationSprites aCorrendoEsquerda, aCorrendoDireita, aPulandoEsquerda, aPulandoDireita;
-    public Status status;
-    private Texture2D _personagem, _personagem_parado_direita, _personagem_parado_esquerda, _atirando_direita, _atirando_esquerda;
+    public enum GroundState { ON_GROUND, FALLING, JUMPING };
+    public GroundState currentGroundState;
+    private AnimationSprites leftWalk, rightWalk, leftJump, rightJump;
+    public State currentState;
+    private Texture2D baseSprite, rightStopSprite, leftStopSprite, rightShootSprite, leftShootSprite;
     public Rectangle obj;
-    private int count_pulo;
+    private int jumpCount;
     private int elapsedTime;
 
     public Player(Game g, int l, int t, int w, int h)
     {
         obj = new Rectangle(l, t, w, h);
         elapsedTime = 0;
-        _personagem_parado_direita = g.Content.Load<Texture2D>("images/player_jump_1.png");
-        _personagem_parado_esquerda = Flip.FlipImage(g.Content.Load<Texture2D>("images/player_jump_1.png"), false, true);
+        rightStopSprite = g.Content.Load<Texture2D>("images/player_jump_1.png");
+        leftStopSprite = Flip.FlipImage(g.Content.Load<Texture2D>("images/player_jump_1.png"), false, true);
 
-        aCorrendoDireita = new AnimationSprites();
-        aCorrendoDireita.Add(g.Content.Load<Texture2D>("images/player_walk_1.png"));
-        aCorrendoDireita.Add(g.Content.Load<Texture2D>("images/player_walk_2.png"));
-        aCorrendoDireita.Add(g.Content.Load<Texture2D>("images/player_walk_3.png"));
-        aCorrendoDireita.Add(g.Content.Load<Texture2D>("images/player_walk_4.png"));
-        aCorrendoDireita.Add(g.Content.Load<Texture2D>("images/player_walk_5.png"));
-        aCorrendoDireita.Add(g.Content.Load<Texture2D>("images/player_walk_6.png"));
-        aCorrendoDireita.Add(g.Content.Load<Texture2D>("images/player_walk_7.png"));
-        aCorrendoDireita.Add(g.Content.Load<Texture2D>("images/player_walk_8.png"));
+        rightWalk = new AnimationSprites();
+        rightWalk.Add(g.Content.Load<Texture2D>("images/player_walk_1.png"));
+        rightWalk.Add(g.Content.Load<Texture2D>("images/player_walk_2.png"));
+        rightWalk.Add(g.Content.Load<Texture2D>("images/player_walk_3.png"));
+        rightWalk.Add(g.Content.Load<Texture2D>("images/player_walk_4.png"));
+        rightWalk.Add(g.Content.Load<Texture2D>("images/player_walk_5.png"));
+        rightWalk.Add(g.Content.Load<Texture2D>("images/player_walk_6.png"));
+        rightWalk.Add(g.Content.Load<Texture2D>("images/player_walk_7.png"));
+        rightWalk.Add(g.Content.Load<Texture2D>("images/player_walk_8.png"));
 
-        aCorrendoEsquerda = new AnimationSprites();
-        aCorrendoEsquerda.Add(Flip.FlipImage(g.Content.Load<Texture2D>("images/player_walk_1.png"), false, true));
-        aCorrendoEsquerda.Add(Flip.FlipImage(g.Content.Load<Texture2D>("images/player_walk_2.png"), false, true));
-        aCorrendoEsquerda.Add(Flip.FlipImage(g.Content.Load<Texture2D>("images/player_walk_3.png"), false, true));
-        aCorrendoEsquerda.Add(Flip.FlipImage(g.Content.Load<Texture2D>("images/player_walk_4.png"), false, true));
-        aCorrendoEsquerda.Add(Flip.FlipImage(g.Content.Load<Texture2D>("images/player_walk_5.png"), false, true));
-        aCorrendoEsquerda.Add(Flip.FlipImage(g.Content.Load<Texture2D>("images/player_walk_6.png"), false, true));
-        aCorrendoEsquerda.Add(Flip.FlipImage(g.Content.Load<Texture2D>("images/player_walk_8.png"), false, true));
+        leftWalk = new AnimationSprites();
+        leftWalk.Add(Flip.FlipImage(g.Content.Load<Texture2D>("images/player_walk_1.png"), false, true));
+        leftWalk.Add(Flip.FlipImage(g.Content.Load<Texture2D>("images/player_walk_2.png"), false, true));
+        leftWalk.Add(Flip.FlipImage(g.Content.Load<Texture2D>("images/player_walk_3.png"), false, true));
+        leftWalk.Add(Flip.FlipImage(g.Content.Load<Texture2D>("images/player_walk_4.png"), false, true));
+        leftWalk.Add(Flip.FlipImage(g.Content.Load<Texture2D>("images/player_walk_5.png"), false, true));
+        leftWalk.Add(Flip.FlipImage(g.Content.Load<Texture2D>("images/player_walk_6.png"), false, true));
+        leftWalk.Add(Flip.FlipImage(g.Content.Load<Texture2D>("images/player_walk_8.png"), false, true));
 
-        aPulandoDireita = new AnimationSprites();
-        aPulandoDireita.Add(g.Content.Load<Texture2D>("images/player_jump_2.png"));
+        rightJump = new AnimationSprites();
+        rightJump.Add(g.Content.Load<Texture2D>("images/player_jump_2.png"));
         //aPulandoDireita.Add(g.Content.Load<Texture2D>("images/megamanx_pulando 3.png"));
         //aPulandoDireita.Add(g.Content.Load<Texture2D>("images/megamanx_pulando 2.png"));
         //aPulandoDireita.Add(g.Content.Load<Texture2D>("images/megamanx_pulando 1.png"));
 
-        aPulandoEsquerda = new AnimationSprites();
-        aPulandoEsquerda.Add(Flip.FlipImage(g.Content.Load<Texture2D>("images/player_jump_2.png"), false, true));
+        leftJump = new AnimationSprites();
+        leftJump.Add(Flip.FlipImage(g.Content.Load<Texture2D>("images/player_jump_2.png"), false, true));
         //aPulandoEsquerda.Add(Flip.FlipImage(g.Content.Load<Texture2D>("images/megamanx_pulando 3.png"), false, true));
         //aPulandoEsquerda.Add(Flip.FlipImage(g.Content.Load<Texture2D>("images/megamanx_pulando 2.png"), false, true));
         //aPulandoEsquerda.Add(Flip.FlipImage(g.Content.Load<Texture2D>("images/megamanx_pulando 1.png"), false, true));
 
-        _atirando_direita = g.Content.Load<Texture2D>("images/player_jump_1.png");
-        _atirando_esquerda = Flip.FlipImage(g.Content.Load<Texture2D>("images/player_jump_1.png"), false, true);
-        status_solo = StatusSolo.NO_CHAO;
-        status = Status.PARADO_DIREITA;
-        _personagem = _personagem_parado_direita;
+        rightShootSprite = g.Content.Load<Texture2D>("images/player_jump_1.png");
+        leftShootSprite = Flip.FlipImage(g.Content.Load<Texture2D>("images/player_jump_1.png"), false, true);
+        currentGroundState = GroundState.ON_GROUND;
+        currentState = State.RIGHT_STOP;
+        baseSprite = rightStopSprite;
 
         elapsedTime = 0;
     }
 
-    public void MoverParaDireita()
+    public void MoveToTheRight()
     {
-        if ((status != Status.CORRENDO_DIREITA) && (status != Status.PULANDO_DIREITA) && (status != Status.PULANDO_ESQUERDA))
+        if ((currentState != State.RIGHT_WALK)
+        && (currentState != State.RIGHT_JUMP)
+        && (currentState != State.LEFT_JUMP))
         {
-            status = Status.CORRENDO_DIREITA;
-            aCorrendoDireita.StartAnimation(300);
+            currentState = State.RIGHT_WALK;
+            rightWalk.StartAnimation(300);
         }
         // obj.X += 10;
     }
 
-    public void MoverParaEsquerda()
+    public void MoveToTheLeft()
     {
-        if ((status != Status.CORRENDO_ESQUERDA) && (status != Status.PULANDO_DIREITA) && (status != Status.PULANDO_ESQUERDA))
+        if ((currentState != State.LEFT_WALK)
+        && (currentState != State.RIGHT_JUMP)
+        && (currentState != State.LEFT_JUMP))
         {
-            status = Status.CORRENDO_ESQUERDA;
-            aCorrendoEsquerda.StartAnimation(300);
+            currentState = State.LEFT_WALK;
+            leftWalk.StartAnimation(300);
         }
         //  obj.X -= 10;
     }
-    public void Pular()
+    public void Jump()
     {
-        if ((status != Status.PULANDO_DIREITA) && (status != Status.PULANDO_ESQUERDA))
+        if ((currentState != State.RIGHT_JUMP)
+        && (currentState != State.LEFT_JUMP))
         {
-            count_pulo = 0;
-            status_solo = StatusSolo.SUBINDO;
+            jumpCount = 0;
+            currentGroundState = GroundState.JUMPING;
 
-            if (status == Status.PARADO_DIREITA)
+            if (currentState == State.RIGHT_STOP)
             {
-                status = Status.PULANDO_DIREITA;
-                aPulandoDireita.StartAnimation(100);
+                currentState = State.RIGHT_JUMP;
+                rightJump.StartAnimation(100);
             }
             else
             {
-                status = Status.PULANDO_ESQUERDA;
-                aPulandoEsquerda.StartAnimation(100);
+                currentState = State.LEFT_JUMP;
+                leftJump.StartAnimation(100);
             }
         }
     }
 
-    public void Atirar()
+    public void Shoot()
     {
-        if ((status == Status.PARADO_DIREITA))
+        if ((currentState == State.RIGHT_STOP))
         {
-            status = Status.ATIRANDO_DIREITA;
+            currentState = State.RIGHT_SHOOT;
         }
-        else if ((status == Status.PARADO_ESQUERDA))
+        else if ((currentState == State.LEFT_STOP))
         {
-            status = Status.ATIRANDO_ESQUERDA;
+            currentState = State.LEFT_SHOOT;
         }
     }
 
-    public void Parar()
+    public void Stop()
     {
-        if (status == Status.CORRENDO_DIREITA)
+        if (currentState == State.RIGHT_WALK)
         {
-            status = Status.PARADO_DIREITA;
-            _personagem = _personagem_parado_direita;
+            currentState = State.RIGHT_STOP;
+            baseSprite = rightStopSprite;
             //  aCorrendoDireita.StopAnimation();
         }
-        else if (status == Status.CORRENDO_ESQUERDA)
+        else if (currentState == State.LEFT_WALK)
         {
-            status = Status.PARADO_ESQUERDA;
-            _personagem = _personagem_parado_esquerda;
+            currentState = State.LEFT_STOP;
+            baseSprite = leftStopSprite;
             //    aCorrendoEsquerda.StopAnimation();
         }
     }
 
-    public void DesenharNaTela(GameTime gameTime, SpriteBatch tela)
+    public void Draw(GameTime gameTime, SpriteBatch screen)
     {
 
-        if ((status == Status.PARADO_DIREITA) || (status == Status.PARADO_ESQUERDA))
+        if ((currentState == State.RIGHT_STOP) || (currentState == State.LEFT_STOP))
         {
-            tela.Draw(_personagem, obj, Color.White);
+            screen.Draw(baseSprite, obj, Color.White);
         }
-        else if (status == Status.CORRENDO_DIREITA)
+        else if (currentState == State.RIGHT_WALK)
         {
-            tela.Draw(aCorrendoDireita.getImage(gameTime), obj, Color.White);
+            screen.Draw(rightWalk.GetImage(gameTime), obj, Color.White);
         }
-        else if (status == Status.CORRENDO_ESQUERDA)
+        else if (currentState == State.LEFT_WALK)
         {
-            tela.Draw(aCorrendoEsquerda.getImage(gameTime), obj, Color.White);
+            screen.Draw(leftWalk.GetImage(gameTime), obj, Color.White);
         }
 
-        if (status == Status.PULANDO_ESQUERDA)
+        if (currentState == State.LEFT_JUMP)
         {
-            tela.Draw(aPulandoEsquerda.getImage(gameTime), obj, Color.White);
+            screen.Draw(leftJump.GetImage(gameTime), obj, Color.White);
         }
-        else if (status == Status.PULANDO_DIREITA)
+        else if (currentState == State.RIGHT_JUMP)
         {
-            tela.Draw(aPulandoDireita.getImage(gameTime), obj, Color.White);
+            screen.Draw(rightJump.GetImage(gameTime), obj, Color.White);
         }
-        else if (status == Status.ATIRANDO_DIREITA)
+        else if (currentState == State.RIGHT_SHOOT)
         {
-            tela.Draw(_atirando_direita, obj, Color.White);
+            screen.Draw(rightShootSprite, obj, Color.White);
         }
-        else if (status == Status.ATIRANDO_ESQUERDA)
+        else if (currentState == State.LEFT_SHOOT)
         {
-            tela.Draw(_atirando_esquerda, obj, Color.White);
+            screen.Draw(leftShootSprite, obj, Color.White);
         }
     }
 
-    public void Processar(GameTime gameTime, int time, List<GameObject> elemento)
+    public void Update(GameTime gameTime, int time, List<GameObject> gameObjects)
     {
         elapsedTime += gameTime.ElapsedGameTime.Milliseconds;
 
         if (elapsedTime >= time)
         {
             elapsedTime = 0;
-            if (((status == Status.PULANDO_ESQUERDA) || (status == Status.PULANDO_DIREITA)) && (status_solo == StatusSolo.SUBINDO))
+            if (((currentState == State.LEFT_JUMP) || (currentState == State.RIGHT_JUMP))
+            && (currentGroundState == GroundState.JUMPING))
             {
-                count_pulo++;
+                jumpCount++;
                 //aqui o deslocamento y sera do personagem
-                if (count_pulo <= 8)
+                if (jumpCount <= 8)
                 {
                     obj.Y -= 25;
                 }
-                else if (count_pulo == 9)
+                else if (jumpCount == 9)
                 {
-                    status_solo = StatusSolo.CAINDO;
+                    currentGroundState = GroundState.FALLING;
                 }
             }
 
-            else if (((status == Status.PULANDO_ESQUERDA) || (status == Status.PULANDO_DIREITA)) && (status_solo == StatusSolo.CAINDO))
+            else if (((currentState == State.LEFT_JUMP) || (currentState == State.RIGHT_JUMP))
+            && (currentGroundState == GroundState.FALLING))
             {
                 obj.Y += 25;
 
-                for (int x = 0; x < elemento.Count; x++)
+                for (int x = 0; x < gameObjects.Count; x++)
                 {
-                    if ((obj.Intersects(elemento[x].obj)) &&
-                      ((obj.Y + obj.Height) <= elemento[x].obj.Y + 30))
+                    if ((obj.Intersects(gameObjects[x].rect)) &&
+                      ((obj.Y + obj.Height) <= gameObjects[x].rect.Y + 30))
                     {
-                        obj.Y = elemento[x].obj.Y - obj.Height;
+                        obj.Y = gameObjects[x].rect.Y - obj.Height;
 
-                        if (status == Status.PULANDO_ESQUERDA)
+                        if (currentState == State.LEFT_JUMP)
                         {
-                            status = Status.PARADO_ESQUERDA;
+                            currentState = State.LEFT_STOP;
                         }
-                        else if (status == Status.PULANDO_DIREITA)
+                        else if (currentState == State.RIGHT_JUMP)
                         {
-                            status = Status.PARADO_DIREITA;
+                            currentState = State.RIGHT_STOP;
                         }
 
-                        status_solo = StatusSolo.NO_CHAO;
+                        currentGroundState = GroundState.ON_GROUND;
                     }
                 }
-
             }
 
-            else if (((status == Status.CORRENDO_DIREITA) || (status == Status.CORRENDO_ESQUERDA)) && (status_solo == StatusSolo.NO_CHAO))
+            else if (((currentState == State.RIGHT_WALK) || (currentState == State.LEFT_WALK))
+            && (currentGroundState == GroundState.ON_GROUND))
             {
                 //Verifico se ele pode estar fora de algum sólido
-                bool pode_cair = true;
-                for (int x = 0; x < elemento.Count; x++)
+                bool canFall = true;
+                for (int x = 0; x < gameObjects.Count; x++)
                 {
-                    if ((elemento[x].obj.Y == (obj.Y + obj.Height)) && (((obj.X + obj.Width) >= elemento[x].obj.X) && (obj.X <= (elemento[x].obj.X + elemento[x].obj.Width))))
+                    if ((gameObjects[x].rect.Y == (obj.Y + obj.Height)) && (((obj.X + obj.Width) >= gameObjects[x].rect.X) && (obj.X <= (gameObjects[x].rect.X + gameObjects[x].rect.Width))))
                     {
-                        pode_cair = false;
+                        canFall = false;
                         break;
                     }
                 }
-                if (pode_cair)
+                if (canFall)
                 {
-                    if (status == Status.CORRENDO_DIREITA)
+                    if (currentState == State.RIGHT_WALK)
                     {
-                        status = Status.PULANDO_DIREITA;
+                        currentState = State.RIGHT_JUMP;
                     }
-                    else if (status == Status.CORRENDO_ESQUERDA)
+                    else if (currentState == State.LEFT_WALK)
                     {
-                        status = Status.PULANDO_ESQUERDA;
+                        currentState = State.LEFT_JUMP;
                     }
 
-                    status_solo = StatusSolo.CAINDO;
+                    currentGroundState = GroundState.FALLING;
                 }
             }
         }

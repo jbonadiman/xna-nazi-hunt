@@ -9,24 +9,25 @@ namespace NaziHunt;
 /// </summary>
 public class Game : Microsoft.Xna.Framework.Game
 {
-    GraphicsDeviceManager graphics;
     SpriteBatch spriteBatch;
-    List<GameObject> aElemento;
-    KeyboardState teclado;
+    KeyboardState keyboard;
     MouseState mouse;
-    MenuScreen tela_menu;
-    Stage1Screen tela_fase1;
-    CreditsScreen tela_credito;
+    MenuScreen menuScreen;
+    Stage1Screen stage1Screen;
+    CreditsScreen creditsScreen;
 
     public Game()
     {
-        graphics = new GraphicsDeviceManager(this);
         Content.RootDirectory = "assets";
+        _ = new GraphicsDeviceManager(this)
+        {
+            IsFullScreen = false
+        };
     }
 
     protected override void Initialize()
     {
-        GameScreens.status = GameScreens.Screen.MENU;
+        GameScreens.CurrentScreen = GameScreens.Screen.MENU;
         base.Initialize();
     }
 
@@ -38,7 +39,9 @@ public class Game : Microsoft.Xna.Framework.Game
     {
         // Create a new SpriteBatch, which can be used to draw textures.
         spriteBatch = new SpriteBatch(GraphicsDevice);
-
+        menuScreen = new MenuScreen(this);
+        stage1Screen = new Stage1Screen(this);
+        creditsScreen = new CreditsScreen(this);
         /*aElemento = new List<ElementoJogo>();
 
         //Adiciona vários blocos de chão
@@ -58,13 +61,7 @@ public class Game : Microsoft.Xna.Framework.Game
             aElemento.Add(new FundoTela(this, posx, altura_tela - 100, 170, 49));
             posx += 170;
         }*/
-
-        tela_menu = new MenuScreen(this);
-        tela_fase1 = new Stage1Screen(this);
-        tela_credito = new CreditsScreen(this);
-
-        spriteBatch = new SpriteBatch(GraphicsDevice);
-        aElemento = new List<GameObject>();
+        base.LoadContent();
     }
 
     /// <summary>
@@ -85,22 +82,22 @@ public class Game : Microsoft.Xna.Framework.Game
         // Allows the game to exit
         if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
         {
-            this.Exit();
+            Exit();
         }
 
-        teclado = Keyboard.GetState();
+        keyboard = Keyboard.GetState();
         mouse = Mouse.GetState();
-        if (GameScreens.status == GameScreens.Screen.MENU)
+        if (GameScreens.CurrentScreen == GameScreens.Screen.MENU)
         {
-            tela_menu.Update(gameTime, mouse);
+            menuScreen.Update(mouse);
         }
-        else if (GameScreens.status == GameScreens.Screen.STAGE1)
+        else if (GameScreens.CurrentScreen == GameScreens.Screen.STAGE1)
         {
-            tela_fase1.Update(gameTime, teclado);
+            stage1Screen.Update(gameTime, keyboard);
         }
-        else if (GameScreens.status == GameScreens.Screen.EXIT)
+        else if (GameScreens.CurrentScreen == GameScreens.Screen.EXIT)
         {
-            this.Exit();
+            Exit();
         }
 
         base.Update(gameTime);
@@ -116,17 +113,17 @@ public class Game : Microsoft.Xna.Framework.Game
 
         spriteBatch.Begin();
 
-        if (GameScreens.status == GameScreens.Screen.MENU)
+        if (GameScreens.CurrentScreen == GameScreens.Screen.MENU)
         {
-            tela_menu.Draw(gameTime, spriteBatch);
+            menuScreen.Draw(spriteBatch);
         }
-        else if (GameScreens.status == GameScreens.Screen.STAGE1)
+        else if (GameScreens.CurrentScreen == GameScreens.Screen.STAGE1)
         {
-            tela_fase1.Draw(gameTime, spriteBatch);
+            stage1Screen.Draw(gameTime, spriteBatch);
         }
-        else if (GameScreens.status == GameScreens.Screen.CREDITS)
+        else if (GameScreens.CurrentScreen == GameScreens.Screen.CREDITS)
         {
-            tela_credito.Draw(gameTime, spriteBatch, GraphicsDevice);
+            creditsScreen.Draw(spriteBatch, GraphicsDevice);
         }
 
         spriteBatch.End();

@@ -4,20 +4,10 @@ namespace NaziHunt;
 
 public class GameObject
 {
-    public Rectangle obj;
+    public Rectangle rect;
 
-    public void DeslocarObjeto(int left)
+    public void MoveOnX(int l)
     {
-        obj.X += left;
-    }
-
-    public void DeslocarObjetoX(int l)
-    {
-        obj.X += l;
-    }
-
-    public void DeslocarObjetoY(int t)
-    {
-        obj.Y += t;
+        rect.X += l;
     }
 }

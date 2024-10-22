@@ -5,16 +5,16 @@ namespace NaziHunt;
 
 public class Crate : GameObject
 {
-    Texture2D imagem;
+    private readonly Texture2D sprite;
 
     public Crate(Game g, int l, int t, int w, int h)
     {
-        obj = new Rectangle(l, t, w, h);
-        imagem = g.Content.Load<Texture2D>("images/crate.png");
+        rect = new Rectangle(l, t, w, h);
+        sprite = g.Content.Load<Texture2D>("images/crate.png");
     }
 
-    public void DesenharNaTela(SpriteBatch tela)
+    public void Draw(SpriteBatch screen)
     {
-        tela.Draw(imagem, obj, Color.White);
+        screen.Draw(sprite, rect, Color.White);
     }
 }

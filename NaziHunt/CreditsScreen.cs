@@ -5,19 +5,22 @@ namespace NaziHunt;
 
 public class CreditsScreen : GameObject
 {
-    Texture2D fundo;//, cursor;
+    private readonly Texture2D credits;//, cursor;
     //MenuItem iniciar_jogo, sair;
 
     //MouseState mouse;
 
     public CreditsScreen(Game g)
     {
-        fundo = g.Content.Load<Texture2D>("images/credits.png");
+        credits = g.Content.Load<Texture2D>("images/credits.png");
     }
 
-    public void Draw(GameTime gameTime, SpriteBatch tela, GraphicsDevice graphics)
+    public void Draw(SpriteBatch screen, GraphicsDevice graphics)
     {
-        tela.Draw(fundo, new Rectangle(graphics.Viewport.Width / 2 - 238 / 2, graphics.Viewport.Height / 2 - 289 / 2, 238, 289), Color.White);
+        screen.Draw(
+            credits,
+            new Rectangle(graphics.Viewport.Width / 2 - 238 / 2, graphics.Viewport.Height / 2 - 289 / 2, 238, 289),
+            Color.White);
         //iniciar_jogo.DesenharNaTela(tela);
         //  continuar.DesenharNaTela(tela);
         // sair.DesenharNaTela(tela);

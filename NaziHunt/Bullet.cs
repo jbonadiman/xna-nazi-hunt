@@ -5,121 +5,124 @@ namespace NaziHunt;
 
 public class Bullet
 {
-    private Texture2D tiro_esquerda, tiro_direita;
-
-    public enum Sentido { PARADO, DIREITA, ESQUERDA };
-
-    public Sentido sentido;
-
-    private Rectangle obj;
-
-    public bool tiro_disparado;
-
+    public enum Orientation
+    {
+        STOPPED, RIGHT, LEFT
+    };
+    public Orientation currentOrientation;
+    public bool shotFired;
+    private readonly Texture2D leftBullet;
+    private readonly Texture2D rightBullet;
+    private Rectangle rect;
     private int elapsedTime;
 
     public Bullet(Game g)
     {
-        tiro_direita = g.Content.Load<Texture2D>("images/bullet.png");
-        tiro_esquerda = Flip.FlipImage(g.Content.Load<Texture2D>("images/bullet.png"), false, true);
-        sentido = Sentido.PARADO;
-        tiro_disparado = false;
-        obj = new Rectangle(0, 0, 10, 10);
+        rightBullet = g.Content.Load<Texture2D>("images/bullet.png");
+        leftBullet = Flip.FlipImage(g.Content.Load<Texture2D>("images/bullet.png"), false, true);
+        currentOrientation = Orientation.STOPPED;
+        shotFired = false;
+        rect = new Rectangle(0, 0, 10, 10);
         elapsedTime = 0;
     }
 
-    public void Disparar(Player p)
+    public void Shoot(Player p)
     {
-        if ((p.status == Player.Status.PARADO_DIREITA) || (p.status == Player.Status.ATIRANDO_DIREITA) || (p.status == Player.Status.CORRENDO_DIREITA))
+        if ((p.currentState == Player.State.RIGHT_STOP)
+        || (p.currentState == Player.State.RIGHT_SHOOT)
+        || (p.currentState == Player.State.RIGHT_WALK))
         {
-            if (!tiro_disparado)
+            if (!shotFired)
             {
                 //Faz o posicionamento do tiro na tela
-                obj.X = p.obj.X + p.obj.Width;
-                obj.Y = p.obj.Y + 37;
-                sentido = Sentido.DIREITA;
-                tiro_disparado = true;
+                rect.X = p.obj.X + p.obj.Width;
+                rect.Y = p.obj.Y + 37;
+                currentOrientation = Orientation.RIGHT;
+                shotFired = true;
             }
         }
-        else if ((p.status == Player.Status.PARADO_ESQUERDA) || (p.status == Player.Status.ATIRANDO_ESQUERDA) || (p.status == Player.Status.CORRENDO_ESQUERDA))
-
+        else if ((p.currentState == Player.State.LEFT_STOP)
+        || (p.currentState == Player.State.LEFT_SHOOT)
+        || (p.currentState == Player.State.LEFT_WALK))
         {
-            if (!tiro_disparado)
+            if (!shotFired)
             {
                 //Faz o posicionamento do tiro na tela
-                obj.X = p.obj.X - obj.Width;
-                obj.Y = p.obj.Y + 37;
-                sentido = Sentido.ESQUERDA;
-                tiro_disparado = true;
+                rect.X = p.obj.X - rect.Width;
+                rect.Y = p.obj.Y + 37;
+                currentOrientation = Orientation.LEFT;
+                shotFired = true;
             }
         }
-
     }
 
-    public void Processar(GameTime gameTime, int time, List<GameObject> elemento)
+    public void Update(GameTime gameTime, int time, List<GameObject> objects)
     {
         elapsedTime += gameTime.ElapsedGameTime.Milliseconds;
 
         if (elapsedTime >= time)
         {
             elapsedTime = 0;
-            if (sentido == Sentido.DIREITA)
+            if (currentOrientation == Orientation.RIGHT)
             {
-                obj.X += 15;
+                rect.X += 15;
 
-                for (int x = 0; x < elemento.Count; x++)
+                for (int x = 0; x < objects.Count; x++)
                 {
-                    if (elemento[x] is Enemy)
+                    if (objects[x] is Enemy)
                     {
-                        if (obj.Intersects(elemento[x].obj))
+                        if (rect.Intersects(objects[x].rect))
                         {
-                            tiro_disparado = false;
-                            sentido = Sentido.PARADO;
-                            elemento.RemoveAt(x);
+                            shotFired = false;
+                            currentOrientation = Orientation.STOPPED;
+                            objects.RemoveAt(x);
                             x--;
                         }
                     }
                 }
 
-                if (obj.X > 800) //800 é a largura da tela em pixels
+                if (rect.X > 800) //800 é a largura da tela em pixels
                 {
-                    tiro_disparado = false;
-                    sentido = Sentido.PARADO;
+                    shotFired = false;
+                    currentOrientation = Orientation.STOPPED;
                 }
             }
-            else if (sentido == Sentido.ESQUERDA)
+            else if (currentOrientation == Orientation.LEFT)
             {
-                obj.X -= 15;
+                rect.X -= 15;
 
-
-                for (int x = 0; x < elemento.Count; x++)
+                for (int x = 0; x < objects.Count; x++)
                 {
-                    if (elemento[x] is Enemy)
+                    if (objects[x] is Enemy)
                     {
-                        if (obj.Intersects(elemento[x].obj))
+                        if (rect.Intersects(objects[x].rect))
                         {
-                            tiro_disparado = false;
-                            sentido = Sentido.PARADO;
-                            elemento.RemoveAt(x);
+                            shotFired = false;
+                            currentOrientation = Orientation.STOPPED;
+                            objects.RemoveAt(x);
                             x--;
                         }
                     }
                 }
 
-                if (obj.X < -obj.Width) //Sair da tela pela esquerda ?
+                if (rect.X < -rect.Width) //Sair da tela pela esquerda ?
                 {
-                    tiro_disparado = false;
-                    sentido = Sentido.PARADO;
+                    shotFired = false;
+                    currentOrientation = Orientation.STOPPED;
                 }
             }
         }
     }
 
-    public void DesenharNaTela(SpriteBatch tela)
+    public void Draw(SpriteBatch screen)
     {
-        if (sentido == Sentido.DIREITA)
-            tela.Draw(tiro_direita, obj, Color.White);
-        if (sentido == Sentido.ESQUERDA)
-            tela.Draw(tiro_esquerda, obj, Color.White);
-
+        if (currentOrientation == Orientation.RIGHT)
+        {
+            screen.Draw(rightBullet, rect, Color.White);
+        }
+        if (currentOrientation == Orientation.LEFT)
+        {
+            screen.Draw(leftBullet, rect, Color.White);
+        }
     }
 }
